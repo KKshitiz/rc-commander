@@ -1,0 +1,115 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.gamepad {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.d-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 10px;
+  width: 240px;
+  height: 240px;
+}
+
+.control-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-btn:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+.control-btn:active {
+  background-color: #1c6ea4;
+  transform: scale(0.95);
+}
+
+#up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+#left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+#down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.status {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.status p {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+#connection-status,
+#current-direction {
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .d-pad {
+    width: 180px;
+    height: 180px;
+  }
+
+  .control-btn {
+    font-size: 20px;
+  }
+}
