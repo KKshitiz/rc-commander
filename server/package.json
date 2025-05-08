@@ -4,14 +4,17 @@
   "description": "RC Car controller with WebSocket connection",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "livekit-server-sdk": "^2.12.0",
     "ws": "^8.18.2"
   },
   "devDependencies": {
