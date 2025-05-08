@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       return;
     }
-
+    console.log("Sending direction:", direction);
     activeDirection = direction;
     currentDirection.textContent =
       direction.charAt(0).toUpperCase() + direction.slice(1);

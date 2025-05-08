@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>RC Car Controller</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div class="container">
+		<header class="header">
+			<div class="logo">
+				<div class="logo-circle"></div>
+				<h1>RC COMMANDER</h1>
+			</div>
+			<div class="status-indicators">
+				<div class="battery-indicator">
+					<div class="battery-icon"></div>
+					<span class="battery-percentage">85%</span>
+				</div>
+				<div class="connection-indicator">
+					<div class="wifi-icon"></div>
+					<span class="connection-status" id="connection-status">Online</span>
+				</div>
+				<div class="settings-button">
+					<button id="settings-btn">⚙️</button>
+				</div>
+			</div>
+		</header>
+
+		<main>
+			<div class="video-container">
+				<video id="video-feed" autoplay playsinline muted></video>
+
+				<div class="record-button">
+					<button id="record-btn">🔴 Record</button>
+				</div>
+			</div>
+
+			<div class="telemetry-panel">
+				<div class="telemetry-header">
+					<h2>Telemetry</h2>
+					<button class="refresh-button">🔄</button>
+				</div>
+				<div class="telemetry-stats">
+					<div class="stat-box">
+						<div class="stat-label">MOTOR TEMP</div>
+						<div class="stat-value" id="motor-temp">42°C</div>
+					</div>
+					<div class="stat-box">
+						<div class="stat-label">SIGNAL</div>
+						<div class="stat-value" id="signal-strength">-78dBm</div>
+					</div>
+					<div class="stat-box">
+						<div class="stat-label">LATENCY</div>
+						<div class="stat-value" id="latency">220ms</div>
+					</div>
+					<div class="stat-box">
+						<div class="stat-label">RUNTIME</div>
+						<div class="stat-value" id="runtime">00:22:18</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="controls-panel">
+				<h2>Controls</h2>
+				<div class="control-instructions">Use keyboard, touch, or gamepad</div>
+				<div class="d-pad">
+					<button id="up" class="control-btn">↑</button>
+					<button id="left" class="control-btn">←</button>
+					<button id="right" class="control-btn">→</button>
+					<button id="down" class="control-btn">↓</button>
+				</div>
+				<p>Current Direction: <span id="current-direction">None</span></p>
+				<div class="drive-indicators">
+					<div class="reverse-indicator">REV</div>
+					<div class="speed-indicator">0 km/h</div>
+					<div class="forward-indicator">FWD</div>
+				</div>
+				<div class="emergency-stop">
+					<p>Press SPACE to emergency stop</p>
+				</div>
+			</div>
+		</main>
+	</div>
+
+	<script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.js"></script>
+	<script src="script.js"></script>
+	<script src="webcam-feed.js"></script>
+</body>
+
+</html>
