@@ -32,7 +32,8 @@
 
 		<main>
 			<div class="video-container">
-				<div class="video-feed"></div>
+				<video id="video-feed" autoplay playsinline muted></video>
+
 				<div class="record-button">
 					<button id="record-btn">🔴 Record</button>
 				</div>
@@ -85,7 +86,9 @@
 		</main>
 	</div>
 
+	<script src="https://unpkg.com/livekit-client/dist/livekit-client.umd.js"></script>
 	<script src="script.js"></script>
+	<script src="webcam-feed.js"></script>
 </body>
 
 </html>

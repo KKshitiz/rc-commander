@@ -129,7 +129,7 @@ main {
 .video-feed {
   width: 100%;
   height: 240px;
-  background-color: #f87171;
+  /* background-color: #f87171; */
   border-radius: 8px;
 }
 
