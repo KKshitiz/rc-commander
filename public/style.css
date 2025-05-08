@@ -6,31 +6,218 @@
 }
 
 body {
-  background-color: #f0f0f0;
+  background-color: #111827;
+  color: white;
   display: flex;
   justify-content: center;
-  padding: 20px;
+  min-height: 100vh;
+  padding: 0;
 }
 
 .container {
-  background-color: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  max-width: 500px;
   width: 100%;
+  max-width: 1200px;
+  padding: 0;
+}
+
+/* Header styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-circle {
+  width: 24px;
+  height: 24px;
+  background-color: #e74c3c;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+  color: #e74c3c;
+  font-size: 24px;
+  font-weight: bold;
 }
 
-.gamepad {
+.status-indicators {
   display: flex;
-  justify-content: center;
-  margin-bottom: 30px;
+  align-items: center;
+  gap: 15px;
+}
+
+.battery-indicator,
+.connection-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.battery-icon,
+.wifi-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.battery-icon {
+  background-color: white;
+  width: 30px;
+  height: 12px;
+  border-radius: 2px;
+  position: relative;
+}
+
+.battery-icon:after {
+  content: "";
+  position: absolute;
+  right: -4px;
+  top: 3px;
+  width: 3px;
+  height: 6px;
+  background-color: white;
+  border-radius: 0 2px 2px 0;
+}
+
+.wifi-icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+}
+
+.wifi-icon:before {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #4ade80;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.connection-status {
+  color: #4ade80;
+}
+
+.settings-button button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* Main content */
+main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 0 20px 20px;
+}
+
+.video-container {
+  flex: 1 1 100%;
+  position: relative;
+}
+
+.video-feed {
+  width: 100%;
+  height: 240px;
+  background-color: #f87171;
+  border-radius: 8px;
+}
+
+.record-button {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.record-button button {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Telemetry panel */
+.telemetry-panel {
+  flex: 1 1 100%;
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.telemetry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.telemetry-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.refresh-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.telemetry-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+.stat-box {
+  background-color: #111827;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #9ca3af;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Controls panel */
+.controls-panel {
+  flex: 1 1 300px;
+  background-color: #1e293b;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+}
+
+.controls-panel h2 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.control-instructions {
+  color: #9ca3af;
+  font-size: 14px;
+  margin-bottom: 20px;
 }
 
 .d-pad {
@@ -38,12 +225,13 @@ h1 {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   gap: 10px;
-  width: 240px;
-  height: 240px;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
 }
 
 .control-btn {
-  background-color: #3498db;
+  background-color: #334155;
   color: white;
   border: none;
   border-radius: 8px;
@@ -56,12 +244,11 @@ h1 {
 }
 
 .control-btn:hover {
-  background-color: #2980b9;
-  transform: scale(1.05);
+  background-color: #475569;
 }
 
 .control-btn:active {
-  background-color: #1c6ea4;
+  background-color: #0f172a;
   transform: scale(0.95);
 }
 
@@ -85,31 +272,29 @@ h1 {
   grid-row: 3;
 }
 
-.status {
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
+.drive-indicators {
+  display: flex;
+  justify-content: space-between;
   margin-top: 20px;
+  color: #9ca3af;
+  font-size: 14px;
 }
 
-.status p {
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-
-#connection-status,
-#current-direction {
-  font-weight: bold;
+.emergency-stop {
+  margin-top: 20px;
+  color: #9ca3af;
+  font-size: 14px;
 }
 
 /* Responsive design */
-@media (max-width: 480px) {
-  .d-pad {
-    width: 180px;
-    height: 180px;
+@media (min-width: 768px) {
+  .video-container {
+    flex: 2;
   }
-
-  .control-btn {
-    font-size: 20px;
+  .telemetry-panel {
+    flex: 1;
+  }
+  .controls-panel {
+    flex: 1;
   }
 }
