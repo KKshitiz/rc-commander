@@ -1,11 +1,70 @@
 // LiveKit configuration
 const wsURL = "wss://rc-jrdbc5kb.livekit.cloud";
-const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDY2OTIxNTAsImlzcyI6IkFQSWRRbnpNOU5RcnJlUSIsIm5iZiI6MTc0NjY4NDk1MCwic3ViIjoicXVpY2tzdGFydCB1c2VyIHU3bjE0NSIsInZpZGVvIjp7ImNhblB1Ymxpc2giOnRydWUsImNhblB1Ymxpc2hEYXRhIjp0cnVlLCJjYW5TdWJzY3JpYmUiOnRydWUsInJvb20iOiJxdWlja3N0YXJ0IHJvb20iLCJyb29tSm9pbiI6dHJ1ZX19.d2mCyNCAvBWg8-2gVljhiIx28Nt-o-CyMCfu7hLWNPE";
+
+// Function to generate a random username
+function generateRandomUsername() {
+  const adjectives = [
+    "Happy",
+    "Brave",
+    "Swift",
+    "Clever",
+    "Mighty",
+    "Nimble",
+    "Daring",
+    "Curious",
+    "Bright",
+    "Agile",
+  ];
+  const nouns = [
+    "Racer",
+    "Driver",
+    "Pilot",
+    "Captain",
+    "Navigator",
+    "Explorer",
+    "Rider",
+    "Commander",
+    "Controller",
+    "Operator",
+  ];
+
+  const randomAdjective =
+    adjectives[Math.floor(Math.random() * adjectives.length)];
+  const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
+  const randomNumber = Math.floor(Math.random() * 1000);
+
+  return `${randomAdjective}${randomNoun}${randomNumber}`;
+}
+
+// Function to fetch token from server
+async function fetchToken() {
+  try {
+    const participantName = generateRandomUsername();
+    console.log("Generated username:", participantName);
+
+    const usernameElement = document.getElementById("username");
+    usernameElement.textContent = participantName;
+
+    const response = await fetch(`/join?name=${participantName}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.accessToken;
+  } catch (error) {
+    console.error("Error fetching token:", error);
+    throw error;
+  }
+}
 
 // Connect to LiveKit room and display video
 async function connectToRoom() {
   try {
+    const token = await fetchToken();
+    console.log("Token received successfully");
+
     const room = new LivekitClient.Room();
 
     // Set up event listener for when tracks are subscribed

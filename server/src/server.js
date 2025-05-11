@@ -1,13 +1,24 @@
 const express = require("express");
 const http = require("http");
 const WebSocket = require("ws");
+const livekit = require("./livekit");
+const cors = require("cors");
+
+require("dotenv").config();
 
 const app = express();
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"],
+  })
+);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // Serve static files from the public directory
-app.use(express.static("public"));
+app.use("/", express.static("public"));
+
+app.use("/join", livekit.generateToken);
 
 wss.on("connection", (ws) => {
   const clientIp = ws._socket.remoteAddress;

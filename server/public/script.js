@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let ws = null;
-  let activeDirection = null;
+  // Track active directions as a Set instead of a single value
+  let activeDirections = new Set();
 
   // Connect to WebSocket server
   function connectWebSocket() {
@@ -47,15 +48,34 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize WebSocket connection
   connectWebSocket();
 
+  // Update the current direction display
+  function updateDirectionDisplay() {
+    if (activeDirections.size === 0) {
+      currentDirection.textContent = "None";
+    } else {
+      currentDirection.textContent = Array.from(activeDirections)
+        .map((dir) => dir.charAt(0).toUpperCase() + dir.slice(1))
+        .join(" + ");
+    }
+  }
+
   // Handle button press
   function handleButtonPress(direction) {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
       return;
     }
-    console.log("Sending direction:", direction);
-    activeDirection = direction;
-    currentDirection.textContent =
-      direction.charAt(0).toUpperCase() + direction.slice(1);
+
+    // Skip if this direction is already active
+    if (activeDirections.has(direction)) {
+      return;
+    }
+
+    // Add to active directions
+    activeDirections.add(direction);
+    console.log(`Sending direction: ${direction}`);
+
+    // Update display
+    updateDirectionDisplay();
 
     // Send direction command to the server
     ws.send(
@@ -65,25 +85,42 @@ document.addEventListener("DOMContentLoaded", () => {
       })
     );
 
-    console.log(`Sending direction: ${direction}`);
+    // Highlight the button
+    if (buttons[direction]) {
+      buttons[direction].classList.add("active");
+    }
   }
 
   // Handle button release
-  function handleButtonRelease() {
-    if (!ws || ws.readyState !== WebSocket.OPEN || !activeDirection) {
+  function handleButtonRelease(direction) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
       return;
     }
 
-    // Send stop command to the server
+    // Skip if this direction is not active
+    if (!activeDirections.has(direction)) {
+      return;
+    }
+
+    // Remove from active directions
+    activeDirections.delete(direction);
+    console.log(`Stopping direction: ${direction}`);
+
+    // Update display
+    updateDirectionDisplay();
+
+    // Send stop command to the server with the direction that was released
     ws.send(
       JSON.stringify({
         action: "stop",
+        direction: direction,
       })
     );
 
-    activeDirection = null;
-    currentDirection.textContent = "None";
-    console.log("Sending stop command");
+    // Remove highlight from the button
+    if (buttons[direction]) {
+      buttons[direction].classList.remove("active");
+    }
   }
 
   // Add event listeners for mouse/touch events
@@ -92,8 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Mouse events
     button.addEventListener("mousedown", () => handleButtonPress(direction));
-    button.addEventListener("mouseup", handleButtonRelease);
-    button.addEventListener("mouseleave", handleButtonRelease);
+    button.addEventListener("mouseup", () => handleButtonRelease(direction));
+    button.addEventListener("mouseleave", () => handleButtonRelease(direction));
 
     // Touch events for mobile
     button.addEventListener("touchstart", (e) => {
@@ -102,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     button.addEventListener("touchend", (e) => {
       e.preventDefault(); // Prevent default touch behavior
-      handleButtonRelease();
+      handleButtonRelease(direction);
     });
   });
 
@@ -120,8 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("keydown", (e) => {
     const direction = keyMap[e.key];
-    if (direction && !activeDirection) {
-      buttons[direction].classList.add("active");
+    if (direction) {
+      // Prevent key repeat from triggering multiple events
+      if (e.repeat) return;
       handleButtonPress(direction);
     }
   });
@@ -129,8 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("keyup", (e) => {
     const direction = keyMap[e.key];
     if (direction) {
-      buttons[direction].classList.remove("active");
-      handleButtonRelease();
+      handleButtonRelease(direction);
     }
   });
 });
