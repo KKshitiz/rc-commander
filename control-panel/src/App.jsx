@@ -36,8 +36,9 @@ export default function App() {
       setError(null);
 
       try {
+        const baseUrl = import.meta.env.VITE_RC_SERVER_BASE_URL;
         // Fetch token from API endpoint
-        const response = await fetch("http://localhost:3000/join?name=car");
+        const response = await fetch(`${baseUrl}/join?name=car`);
 
         if (!response.ok) {
           throw new Error(
