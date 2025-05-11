@@ -237,19 +237,71 @@ main {
   border-radius: 8px;
   font-size: 24px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .control-btn:hover {
   background-color: #475569;
 }
 
-.control-btn:active {
-  background-color: #0f172a;
+/* Active state styling - enhanced to be more visible */
+.control-btn.active {
+  background-color: #0ea5e9; /* Bright blue when active */
   transform: scale(0.95);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Ripple effect animation */
+.control-btn::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.3) 10%,
+    transparent 70%
+  );
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.control-btn.active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: 0s;
+}
+
+/* Add glowing effect to active buttons */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3),
+      inset 0 0 2px rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(14, 165, 233, 0.5),
+      inset 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(14, 165, 233, 0.3),
+      inset 0 0 2px rgba(255, 255, 255, 0.2);
+  }
+}
+
+.control-btn.active {
+  animation: glowPulse 1.5s infinite;
 }
 
 #up {
