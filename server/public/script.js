@@ -74,16 +74,20 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Send stop command to the server
+    // Store the direction that was active before clearing it
+    const releasedDirection = activeDirection;
+
+    // Send stop command to the server with the direction that was released
     ws.send(
       JSON.stringify({
         action: "stop",
+        direction: releasedDirection, // Include the direction that was stopped
       })
     );
 
     activeDirection = null;
     currentDirection.textContent = "None";
-    console.log("Sending stop command");
+    console.log(`Stopping direction: ${releasedDirection}`);
   }
 
   // Add event listeners for mouse/touch events
