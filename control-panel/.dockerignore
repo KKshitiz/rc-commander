@@ -1,0 +1,29 @@
+# Node modules and build output
+node_modules
+dist
+
+# Dependency lock files from other package managers
+package-lock.json
+yarn.lock
+
+# Vite/React/Vue/other tool caches
+.cache
+.pnpm-store
+.vite
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.log
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Misc
+*.swp
+*.swo
