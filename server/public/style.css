@@ -350,3 +350,32 @@ main {
     flex: 1;
   }
 }
+
+/* Joystick styles */
+#joystick-container {
+  user-select: none;
+  touch-action: none;
+}
+#joystick-base {
+  background: #eee;
+  border: 2px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+#joystick-knob {
+  background: #bbb;
+  border: 2px solid #888;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  transition: box-shadow 0.1s;
+}
+#joystick-knob:active {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+#control-mode-toggle {
+  font-size: 1em;
+  margin-bottom: 10px;
+  text-align: center;
+}
+#control-mode-toggle label {
+  cursor: pointer;
+  margin-right: 8px;
+}

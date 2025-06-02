@@ -71,6 +71,27 @@
 			<div class="controls-panel">
 				<h2>Controls</h2>
 				<div class="control-instructions">Use keyboard, touch, or gamepad</div>
+				<div id="gamepad-status" style="color: gray; font-size: 0.95em; margin-bottom: 8px;">No gamepad detected
+				</div>
+
+				<!-- Control mode toggle -->
+				<div id="control-mode-toggle" style="margin-bottom: 10px;">
+					<label><input type="radio" name="control-mode" value="dpad" checked> D-pad</label>
+					<label style="margin-left: 12px;"><input type="radio" name="control-mode" value="joystick">
+						Joystick</label>
+				</div>
+
+				<!-- Joystick UI (hidden by default) -->
+				<div id="joystick-container"
+					style="display: none; margin: 0 auto 12px auto; width: 120px; height: 120px; position: relative;">
+					<div id="joystick-base"
+						style="width: 100%; height: 100%; background: #eee; border-radius: 50%; position: absolute; top: 0; left: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+					</div>
+					<div id="joystick-knob"
+						style="width: 48px; height: 48px; background: #bbb; border-radius: 50%; position: absolute; top: 36px; left: 36px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); cursor: grab;">
+					</div>
+				</div>
+
 				<div class="d-pad">
 					<button id="up" class="control-btn">↑</button>
 					<button id="left" class="control-btn">←</button>
