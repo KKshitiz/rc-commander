@@ -8,7 +8,8 @@ import {
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { Room, Track } from "livekit-client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
 
 const serverUrl = "wss://rc-jrdbc5kb.livekit.cloud";
 
@@ -25,7 +26,17 @@ export default function App() {
   const [isConnecting, setIsConnecting] = useState(true);
   const [error, setError] = useState(null);
 
-  // Connect to room with token from API
+  // Backend WebSocket state
+  const [backendWs, setBackendWs] = useState(null);
+  const [backendConnected, setBackendConnected] = useState(false);
+  const [rcServerConnected, setRcServerConnected] = useState(false);
+  const [arduinoConnected, setArduinoConnected] = useState(false);
+  const [currentDirection, setCurrentDirection] = useState(null);
+  const [serialLogs, setSerialLogs] = useState([]);
+
+  const logsEndRef = useRef(null);
+
+  // Connect to LiveKit room
   useEffect(() => {
     let mounted = true;
 
@@ -78,39 +89,108 @@ export default function App() {
     };
   }, [room]);
 
+  // Connect to backend WebSocket
+  useEffect(() => {
+    const connectToBackend = () => {
+      const backendUrl = import.meta.env.VITE_BACKEND_WS_URL;
+      const ws = new WebSocket(backendUrl);
+
+      ws.onopen = () => {
+        console.log("Connected to backend");
+        setBackendConnected(true);
+        setBackendWs(ws);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+
+          switch (message.type) {
+            case "status":
+              if (message.data.rcServerConnected !== undefined) {
+                setRcServerConnected(message.data.rcServerConnected);
+              }
+              if (message.data.arduinoConnected !== undefined) {
+                setArduinoConnected(message.data.arduinoConnected);
+              }
+              if (message.data.lastDirection !== undefined) {
+                setCurrentDirection(message.data.lastDirection);
+              }
+              break;
+
+            case "direction":
+              setCurrentDirection(message.data);
+              break;
+
+            case "serial_log":
+              setSerialLogs((prev) => [...prev.slice(-99), message.data]); // Keep last 100
+              break;
+
+            case "serial_logs":
+              setSerialLogs(message.data);
+              break;
+
+            default:
+              console.log("Unknown message type:", message.type);
+          }
+        } catch (error) {
+          console.error("Error processing backend message:", error);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log("Disconnected from backend, reconnecting...");
+        setBackendConnected(false);
+        setBackendWs(null);
+        setTimeout(connectToBackend, 3000);
+      };
+
+      ws.onerror = (error) => {
+        console.error("Backend WebSocket error:", error);
+      };
+    };
+
+    connectToBackend();
+
+    return () => {
+      if (backendWs) {
+        backendWs.close();
+      }
+    };
+  }, []);
+
+  // Auto-scroll logs to bottom
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [serialLogs]);
+
+  // Format direction for display
+  const formatDirection = (direction) => {
+    if (!direction) return "None";
+
+    if (direction.action === "stop") {
+      return `Stop (${direction.direction || "all"})`;
+    }
+
+    return `${direction.action}: ${direction.direction}`;
+  };
+
+  // Status indicator component
+  const StatusIndicator = ({ connected, label }) => (
+    <div className="status-indicator">
+      <div
+        className={`status-dot ${connected ? "connected" : "disconnected"}`}
+      ></div>
+      <span className="status-label">{label}</span>
+    </div>
+  );
+
   // Show loading state while connecting
   if (isConnecting) {
     return (
-      <div
-        className="connecting-container"
-        style={{
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          background: "#f0f4f9",
-        }}
-      >
-        <div
-          className="connecting-spinner"
-          style={{
-            border: "4px solid rgba(0, 0, 0, 0.1)",
-            borderLeft: "4px solid #3291ff",
-            borderRadius: "50%",
-            width: "40px",
-            height: "40px",
-            animation: "spin 1s linear infinite",
-            marginBottom: "20px",
-          }}
-        ></div>
+      <div className="connecting-container">
+        <div className="connecting-spinner"></div>
         <p>Connecting to room...</p>
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
       </div>
     );
   }
@@ -118,39 +198,12 @@ export default function App() {
   // Show error state
   if (error) {
     return (
-      <div
-        className="error-container"
-        style={{
-          height: "100vh",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          background: "#fff0f0",
-          padding: "20px",
-        }}
-      >
-        <div
-          style={{
-            color: "#e53e3e",
-            fontSize: "24px",
-            marginBottom: "20px",
-          }}
-        >
-          ⚠️ Connection Error
-        </div>
+      <div className="error-container">
+        <div className="error-icon">⚠️ Connection Error</div>
         <p>{error}</p>
         <button
           onClick={() => window.location.reload()}
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            background: "#3291ff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
+          className="retry-button"
         >
           Try Again
         </button>
@@ -159,16 +212,66 @@ export default function App() {
   }
 
   return (
-    <RoomContext.Provider value={room}>
-      <div data-lk-theme="default" style={{ height: "100vh" }}>
-        {/* Your custom component with basic video conferencing functionality. */}
-        <MyVideoConference />
-        {/* The RoomAudioRenderer takes care of room-wide audio for you. */}
-        <RoomAudioRenderer />
-        {/* Controls for the user to start/stop audio, video, and screen share tracks */}
-        <ControlBar />
+    <div className="app-container">
+      {/* Header with status indicators */}
+      <header className="app-header">
+        <h1>RC Car Control Panel</h1>
+        <div className="status-indicators">
+          <StatusIndicator connected={backendConnected} label="Backend" />
+          <StatusIndicator connected={rcServerConnected} label="RC Server" />
+          <StatusIndicator connected={arduinoConnected} label="Arduino" />
+        </div>
+      </header>
+
+      {/* Main content area */}
+      <div className="main-content">
+        {/* Video feed section */}
+        <div className="video-section">
+          <RoomContext.Provider value={room}>
+            <div data-lk-theme="default" className="video-container">
+              <MyVideoConference />
+              <RoomAudioRenderer />
+              <ControlBar />
+            </div>
+          </RoomContext.Provider>
+        </div>
+
+        {/* Control info section */}
+        <div className="control-section">
+          <div className="direction-display">
+            <h3>Current Direction</h3>
+            <div className="direction-value">
+              {formatDirection(currentDirection)}
+            </div>
+            {currentDirection && (
+              <div className="direction-timestamp">
+                Last updated: {new Date().toLocaleTimeString()}
+              </div>
+            )}
+          </div>
+
+          {/* Serial logs section */}
+          <div className="serial-logs">
+            <h3>Arduino Serial Logs</h3>
+            <div className="logs-container">
+              {serialLogs.length === 0 ? (
+                <div className="no-logs">No logs yet...</div>
+              ) : (
+                serialLogs.map((log, index) => (
+                  <div key={index} className="log-entry">
+                    <span className="log-timestamp">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </span>
+                    <span className="log-message">{log.message}</span>
+                  </div>
+                ))
+              )}
+              <div ref={logsEndRef} />
+            </div>
+          </div>
+        </div>
       </div>
-    </RoomContext.Provider>
+    </div>
   );
 }
 
@@ -185,7 +288,7 @@ function MyVideoConference() {
   return (
     <GridLayout
       tracks={tracks}
-      style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
+      style={{ height: "calc(100% - var(--lk-control-bar-height))" }}
     >
       {/* The GridLayout accepts zero or one child. The child is used
       as a template to render all passed in tracks. */}
