@@ -59,6 +59,64 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Map direction combinations to commands
+  function mapDirectionsToCommand(directions) {
+    const hasUp = directions.has("up");
+    const hasDown = directions.has("down");
+    const hasLeft = directions.has("left");
+    const hasRight = directions.has("right");
+
+    // No directions = STOP
+    if (directions.size === 0) {
+      return "STOP";
+    }
+
+    // Forward combinations
+    if (hasUp && !hasDown) {
+      if (hasLeft && !hasRight) {
+        return "FORWARD_LEFT";
+      } else if (hasRight && !hasLeft) {
+        return "FORWARD_RIGHT";
+      } else if (!hasLeft && !hasRight) {
+        return "FORWARD";
+      }
+    }
+
+    // Backward combinations
+    if (hasDown && !hasUp) {
+      if (hasLeft && !hasRight) {
+        return "BACKWARD_LEFT";
+      } else if (hasRight && !hasLeft) {
+        return "BACKWARD_RIGHT";
+      } else if (!hasLeft && !hasRight) {
+        return "BACKWARD";
+      }
+    }
+
+    // Pure left/right without forward/backward - don't send anything (STOP)
+    if (!hasUp && !hasDown) {
+      return "STOP";
+    }
+
+    // Conflicting directions (up+down) - stop
+    return "STOP";
+  }
+
+  // Send mapped command to server
+  function sendMappedCommand(command) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
+
+    console.log(`Sending mapped command: ${command}`);
+
+    // Update display
+    updateDirectionDisplay();
+
+    // Send mapped command to the server
+    ws.send(JSON.stringify({ command }));
+  }
+
   // Handle button press
   function handleButtonPress(direction) {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -72,18 +130,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Add to active directions
     activeDirections.add(direction);
-    console.log(`Sending direction: ${direction}`);
+    console.log(`Direction pressed: ${direction}`);
 
-    // Update display
-    updateDirectionDisplay();
-
-    // Send direction command to the server
-    ws.send(
-      JSON.stringify({
-        action: "move",
-        direction: direction,
-      })
-    );
+    // Map current directions to command and send
+    const mappedCommand = mapDirectionsToCommand(activeDirections);
+    sendMappedCommand(mappedCommand);
 
     // Highlight the button
     if (buttons[direction]) {
@@ -104,18 +155,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Remove from active directions
     activeDirections.delete(direction);
-    console.log(`Stopping direction: ${direction}`);
+    console.log(`Direction released: ${direction}`);
 
-    // Update display
-    updateDirectionDisplay();
-
-    // Send stop command to the server with the direction that was released
-    ws.send(
-      JSON.stringify({
-        action: "stop",
-        direction: direction,
-      })
-    );
+    // Map current directions to command and send
+    const mappedCommand = mapDirectionsToCommand(activeDirections);
+    sendMappedCommand(mappedCommand);
 
     // Remove highlight from the button
     if (buttons[direction]) {
